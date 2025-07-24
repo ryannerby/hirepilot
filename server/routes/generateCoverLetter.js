@@ -1,12 +1,11 @@
-// generateCoverLetter.js
-const express = require('express');
-const router = express.Router();
-const { Configuration, OpenAIApi } = require("openai");
+import express from 'express';
+import OpenAI from 'openai';
 
-const configuration = new Configuration({
+const router = express.Router();
+
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 router.post('/', async (req, res) => {
   const { jobDesc, resumeText } = req.body;
@@ -28,14 +27,14 @@ ${resumeText}
 Keep it under 350 words. Make it sound confident, motivated, and human.
     `;
 
-    const completion = await openai.createChatCompletion({
+    const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
       max_tokens: 450,
       temperature: 0.7,
     });
 
-    const coverLetter = completion.data.choices[0].message.content;
+    const coverLetter = completion.choices[0].message.content;
 
     res.json({ coverLetter });
   } catch (error) {
@@ -44,4 +43,4 @@ Keep it under 350 words. Make it sound confident, motivated, and human.
   }
 });
 
-module.exports = router;
+export default router;

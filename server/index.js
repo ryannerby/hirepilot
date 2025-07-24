@@ -1,36 +1,49 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
+import 'dotenv/config';          // loads .env automatically
+import express from 'express';
+import cors from 'cors';
 
-const userRoutes = require('./routes/user');
-const applicationRouter = require('./routes/application');
-const generateCoverLetterRouter = require('./routes/generateCoverLetter');
+import userRoutes from './routes/user.js';
+import applicationRouter from './routes/application.js';
+import generateCoverLetterRouter from './routes/generateCoverLetter.js';
+
+import db from './models/index.js';
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Request logging middleware (logs every request)
+app.use('/users', userRoutes);
+app.use('/applications', applicationRouter);
+app.use('/api/generate-cover-letter', generateCoverLetterRouter);
+
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
 
-// Routes
-app.use('/users', userRoutes);
-app.use('/applications', applicationRouter);
-app.use('/api/generate-cover-letter', generateCoverLetterRouter);
-
-// Health check
-app.get('/health', (req, res) => res.send('OK'));
-
-// Root route
-app.get('/', (req, res) => res.send('HirePilot backend is running'));
-
-// Start server
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+app.get('/health', (req, res) => {
+  res.send('OK');
 });
+
+app.get('/', (req, res) => {
+  res.send('HirePilot backend is running');
+});
+
+const PORT = process.env.PORT || 5001;
+
+(async () => {
+  try {
+    await db.sequelize.authenticate();
+    console.log('✅ Database connected!');
+    await db.sequelize.sync({ alter: true }); // or use force: true if you want to reset tables during dev
+
+    app.listen(PORT, () => {
+      console.log(`Server running at http://localhost:${PORT}`);
+    });
+
+  } catch (err) {
+    console.error('❌ DB connection failed:', err);
+    process.exit(1); // Exit if DB connection fails
+  }
+})();

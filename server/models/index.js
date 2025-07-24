@@ -1,57 +1,46 @@
-'use strict';
+import Sequelize from 'sequelize';
+import dotenv from 'dotenv';
+import configFile from '../config/config.js';
 
-const fs = require('fs');
-const path = require('path');
-const Sequelize = require('sequelize');
-const basename = path.basename(__filename);
+import User from './user.js';
+import Application from './application.js';
+
+dotenv.config();
+
 const env = process.env.NODE_ENV || 'development';
-
-// Load environment variables early
-require('dotenv').config();
-
-// Import config from JS file
-const config = require(__dirname + '/../config/config.js')[env];
-
-const db = {};
+const config = configFile[env];
 
 let sequelize;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
-  sequelize = new Sequelize(
-    config.database,
-    config.username,
-    config.password,
-    config
-  );
+  sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
-// Read all model files (except this file) and import them
-fs
-  .readdirSync(__dirname)
-  .filter(file => {
-    return (
-      file.indexOf('.') !== 0 && // ignore hidden files
-      file !== basename &&
-      file.slice(-3) === '.js'
-    );
-  })
-  .forEach(file => {
-    const model = require(path.join(__dirname, file))(
-      sequelize,
-      Sequelize.DataTypes
-    );
-    db[model.name] = model;
-  });
+// Initialize models
+User.initModel(sequelize);
+Application.initModel(sequelize);
 
-// Setup associations if any (optional)
-Object.keys(db).forEach(modelName => {
-  if (db[modelName].associate) {
-    db[modelName].associate(db);
+// Setup associations
+User.associate({ Application });
+Application.associate({ User });
+
+const db = {
+  sequelize,
+  Sequelize,
+  User,
+  Application,
+};
+
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Database connected successfully');
+    // Uncomment if you want to sync DB schema
+    // await sequelize.sync({ alter: true });
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
   }
-});
+})();
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
-
-module.exports = db;
+export default db;

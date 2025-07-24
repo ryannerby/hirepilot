@@ -1,6 +1,8 @@
-const express = require('express');
+import express from 'express';
+import db from '../models/index.js';
+
 const router = express.Router();
-const { User } = require('../models'); // Adjust path if needed
+const { User } = db;
 
 router.get('/', async (req, res) => {
   try {
@@ -14,7 +16,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    console.log('Incoming POST body:', req.body); // <-- Add this to debug
+    console.log('Incoming POST body:', req.body);
     const user = await User.create(req.body);
     res.status(201).json(user);
   } catch (err) {
@@ -23,5 +25,4 @@ router.post('/', async (req, res) => {
   }
 });
 
-
-module.exports = router;
+export default router;

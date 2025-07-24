@@ -1,6 +1,8 @@
-const express = require('express');
+import express from 'express';
+import db from '../models/index.js';
+
 const router = express.Router();
-const { Application } = require('../models');
+const { Application } = db;
 
 // Create a new application
 router.post('/', async (req, res) => {
@@ -13,7 +15,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get all applications (optionally filter by userId via query param)
+// Get all applications (optionally filter by userId)
 router.get('/', async (req, res) => {
   try {
     const whereClause = {};
@@ -29,7 +31,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Update an application by id
+// Update application
 router.patch('/:id', async (req, res) => {
   try {
     const [updated] = await Application.update(req.body, {
@@ -47,7 +49,7 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
-// Delete an application by id
+// Delete application
 router.delete('/:id', async (req, res) => {
   try {
     const deleted = await Application.destroy({
@@ -64,4 +66,4 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
