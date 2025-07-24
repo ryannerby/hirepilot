@@ -6,7 +6,7 @@ const userRoutes = require('./routes/user');
 
 app.use(cors());
 app.use(express.json());
-app.use(userRoutes); // Mounts /users
+app.use('/users', userRoutes); // Mounts /users
 
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
