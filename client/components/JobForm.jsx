@@ -1,14 +1,25 @@
 'use client';
 
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 
 export default function JobForm({ onGenerate }) {
   const [jobDesc, setJobDesc] = useState('');
   const [resumeText, setResumeText] = useState('');
+  const { data: session } = useSession();
+
+  console.log('Session:', session);
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onGenerate({ jobDesc, resumeText });
+
+    const userId = session?.user?.id;
+
+    console.log('Session:', session);
+    console.log('User ID:', userId);
+
+    onGenerate({ jobDesc, resumeText, userId });
   };
 
   return (
@@ -18,11 +29,9 @@ export default function JobForm({ onGenerate }) {
       spellCheck="false"
       autoComplete="off"
     >
+      {/* Job Description */}
       <div>
-        <label
-          htmlFor="jobDesc"
-          className="block text-sm font-medium text-[#4a4a4a] mb-3"
-        >
+        <label htmlFor="jobDesc" className="block text-sm font-medium text-[#4a4a4a] mb-3">
           Job Description
         </label>
         <textarea
@@ -37,11 +46,9 @@ export default function JobForm({ onGenerate }) {
         />
       </div>
 
+      {/* Resume Text */}
       <div>
-        <label
-          htmlFor="resumeText"
-          className="block text-sm font-medium text-[#4a4a4a] mb-3"
-        >
+        <label htmlFor="resumeText" className="block text-sm font-medium text-[#4a4a4a] mb-3">
           Resume (Plain text)
         </label>
         <textarea
@@ -56,6 +63,7 @@ export default function JobForm({ onGenerate }) {
         />
       </div>
 
+      {/* Submit */}
       <button
         type="submit"
         className="w-full rounded-3xl bg-[#4a4a4a] text-[#fafafa] font-semibold py-4 text-lg
