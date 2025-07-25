@@ -4,6 +4,11 @@ class User extends Model {
   static initModel(sequelize) {
     User.init(
       {
+        id: {
+          type: DataTypes.STRING,
+          primaryKey: true,
+          allowNull: false,
+        },
         name: {
           type: DataTypes.STRING,
           allowNull: false,

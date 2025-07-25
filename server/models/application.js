@@ -11,7 +11,7 @@ class Application extends Model {
         coverLetterText: DataTypes.TEXT,
         status: DataTypes.STRING,
         appliedDate: DataTypes.DATE,
-        userId: DataTypes.INTEGER,
+        userId: DataTypes.STRING,
       },
       {
         sequelize,

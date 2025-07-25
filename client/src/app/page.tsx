@@ -11,19 +11,23 @@ export default function Page() {
 type GenerateArgs = {
   jobDesc: string;
   resumeText: string;
+  userId: string;
+  jobTitle?: string;
+  company?: string;
 };
 
-const handleGenerate = async ({ jobDesc, resumeText }: GenerateArgs) => {
+const handleGenerate = async ({ jobDesc, resumeText, userId, jobTitle = '', company = '' }: GenerateArgs) => {
   setLoading(true);
   setCoverLetter('');
   try {
     const res = await fetch('http://localhost:5001/api/generate-cover-letter', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jobDesc, resumeText }),
+      body: JSON.stringify({ jobDesc, resumeText, userId, jobTitle, company }),
     });
 
     const data = await res.json();
+    console.log('Returned data:', data);
     setCoverLetter(data.coverLetter || 'No cover letter returned.');
   } catch (error) {
     alert('Something went wrong. Try again.');
