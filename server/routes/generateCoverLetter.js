@@ -2,7 +2,7 @@ import express from 'express';
 import OpenAI from 'openai';
 import Application from '../models/application.js';
 import User from '../models/user.js';
-
+import requireUser from '../middleware/requireUser.js';
 
 const router = express.Router();
 
@@ -12,8 +12,10 @@ const openai = new OpenAI({
 
 const useMock = process.env.USE_MOCK_AI === 'true';
 
-router.post('/', async (req, res) => {
-  const { jobDesc, resumeText, jobTitle, company, userId } = req.body;
+router.post('/', requireUser, async (req, res) => {
+  const { jobDesc, resumeText, jobTitle, company } = req.body;
+  const userId = req.userId; // ✅ Securely injected by the middleware
+
 
   if (!jobDesc || !resumeText) {
     return res.status(400).json({ error: 'Missing job description or resume text.' });
@@ -27,6 +29,8 @@ router.post('/', async (req, res) => {
 
   // MOCK MODE
   if (useMock) {
+    console.log('🔧 Using MOCK AI mode');
+
     const snippet = jobDesc.length > 100 ? jobDesc.slice(0, 100) + '...' : jobDesc;
 
     const fakeCoverLetter = `

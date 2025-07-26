@@ -1,40 +1,62 @@
 'use client';
 
+import { useSession } from 'next-auth/react';
 import AuthButtons from '../../components/AuthButtons.jsx';
 import JobForm from '../../components/JobForm';
 import { useState } from 'react';
 
 export default function Page() {
+  const { data: session, status } = useSession();
   const [loading, setLoading] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
 
-type GenerateArgs = {
-  jobDesc: string;
-  resumeText: string;
-  userId: string;
-  jobTitle?: string;
-  company?: string;
-};
-
-const handleGenerate = async ({ jobDesc, resumeText, userId, jobTitle = '', company = '' }: GenerateArgs) => {
-  setLoading(true);
-  setCoverLetter('');
-  try {
-    const res = await fetch('http://localhost:5001/api/generate-cover-letter', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jobDesc, resumeText, userId, jobTitle, company }),
-    });
-
-    const data = await res.json();
-    console.log('Returned data:', data);
-    setCoverLetter(data.coverLetter || 'No cover letter returned.');
-  } catch (error) {
-    alert('Something went wrong. Try again.');
+  if (status === 'loading') {
+    return <div className="text-center">Loading session...</div>;
   }
-  setLoading(false);
-};
 
+  if (!session) {
+    return (
+      <main className="min-h-screen bg-[#f5f4f3] text-[#141414] px-6 py-20 flex justify-center font-sans antialiased">
+        <div className="w-full max-w-3xl bg-white border border-[#dfdedb] rounded-[32px] shadow-sm px-12 py-16">
+          <h1 className="text-3xl font-bold mb-6">You must be signed in</h1>
+          <AuthButtons />
+        </div>
+      </main>
+    );
+  }
+
+  const handleGenerate = async ({
+    jobDesc,
+    resumeText,
+    jobTitle = '',
+    company = '',
+  }: {
+    jobDesc: string;
+    resumeText: string;
+    jobTitle?: string;
+    company?: string;
+  }) => {
+    setLoading(true);
+    setCoverLetter('');
+
+    const userId = session.user.id;
+
+    try {
+      const res = await fetch('http://localhost:5001/api/generate-cover-letter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobDesc, resumeText, jobTitle, company, userId }),
+      });
+
+      const data = await res.json();
+      setCoverLetter(data.coverLetter || 'No cover letter returned.');
+    } catch (error) {
+      console.error('Error generating cover letter:', error);
+      alert('Something went wrong. Try again.');
+    }
+
+    setLoading(false);
+  };
 
   return (
     <main className="min-h-screen bg-[#f5f4f3] text-[#141414] px-6 py-20 flex justify-center font-sans antialiased">
@@ -49,7 +71,6 @@ const handleGenerate = async ({ jobDesc, resumeText, userId, jobTitle = '', comp
         </header>
 
         <AuthButtons />
-
         <JobForm onGenerate={handleGenerate} />
 
         {loading && (

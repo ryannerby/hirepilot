@@ -1,25 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 
 export default function JobForm({ onGenerate }) {
   const [jobDesc, setJobDesc] = useState('');
   const [resumeText, setResumeText] = useState('');
-  const { data: session } = useSession();
-
-  console.log('Session:', session);
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const userId = session?.user?.id;
-
-    console.log('Session:', session);
-    console.log('User ID:', userId);
-
-    onGenerate({ jobDesc, resumeText, userId });
+    onGenerate({ jobDesc, resumeText }); // Don't pass session here
   };
 
   return (
