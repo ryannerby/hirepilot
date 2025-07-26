@@ -6,11 +6,12 @@ import requireUser from '../middleware/requireUser.js';
 
 const router = express.Router();
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const apiKey = process.env.OPENAI_API_KEY;
+const useMock = process.env.USE_MOCK_AI === 'true' || !apiKey;
 
-const useMock = process.env.USE_MOCK_AI === 'true';
+const openai = new OpenAI({
+  apiKey,
+});
 
 router.post('/', requireUser, async (req, res) => {
   const { jobDesc, resumeText, jobTitle, company } = req.body;
