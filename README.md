@@ -346,3 +346,11 @@ server's environment. The application shares authentication and database
 credentials with the Next.js client, so ensure values like `NEXTAUTH_SECRET` and
 the Postgres settings (`DB_USER`, `DB_PASSWORD`, `DB_NAME`) match across both
 apps. When `USE_MOCK_AI` is `true` or `OPENAI_API_KEY` is not defined, the `/api/generate-cover-letter` endpoint returns a built-in mock letter which will be saved to the `Applications` table.
+
+1. Copy `server/.env.example` to `server/.env` and configure your database
+   settings. Use the **same** `NEXTAUTH_SECRET` here and in the client.
+2. Copy `client/.env.local.example` to `client/.env.local` and add your Google
+   OAuth credentials. Ensure `NEXTAUTH_SECRET` matches the value in `server/.env`
+   so that authenticated requests succeed.
+3. Run the Express backend and Next.js client in separate terminals:
+   `cd server && npm run dev` and `cd client && npm run dev`.

@@ -1,6 +1,13 @@
 import jwt from 'jsonwebtoken';
 
+const { NEXTAUTH_SECRET } = process.env;
+
 export default function requireUser(req, res, next) {
+  if (!NEXTAUTH_SECRET) {
+    console.error('NEXTAUTH_SECRET is not set in the server environment');
+    return res.status(500).json({ error: 'Server misconfigured' });
+  }
+
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
@@ -10,7 +17,7 @@ export default function requireUser(req, res, next) {
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
+    const decoded = jwt.verify(token, NEXTAUTH_SECRET);
     req.userId = decoded.id;
     next();
   } catch (err) {
