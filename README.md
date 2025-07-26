@@ -337,3 +337,12 @@ HirePilot addresses a real, measurable pain point in the job search process with
 4. Clear value demonstration (time savings + better outcomes)
 
 The recommended enhancements focus on creating sustainable competitive advantages through data network effects, deeper integrations, and expanded use cases beyond just cover letter generation.
+
+## Development Setup
+
+The backend reads environment variables from a `.env` file. To enable mock cover
+letter generation without an OpenAI API key, define `USE_MOCK_AI=true` in the
+server's environment. The application shares authentication and database
+credentials with the Next.js client, so ensure values like `NEXTAUTH_SECRET` and
+the Postgres settings (`DB_USER`, `DB_PASSWORD`, `DB_NAME`) match across both
+apps. When `USE_MOCK_AI` is `true` or `OPENAI_API_KEY` is not defined, the `/api/generate-cover-letter` endpoint returns a built-in mock letter which will be saved to the `Applications` table.
