@@ -352,5 +352,7 @@ apps. When `USE_MOCK_AI` is `true` or `OPENAI_API_KEY` is not defined, the `/api
 2. Copy `client/.env.local.example` to `client/.env.local` and add your Google
    OAuth credentials. Ensure `NEXTAUTH_SECRET` matches the value in `server/.env`
    so that authenticated requests succeed.
-3. Run the Express backend and Next.js client in separate terminals:
-   `cd server && npm run dev` and `cd client && npm run dev`.
+3. Start both servers with a single command from the project root:
+   `npm run dev`
+   (This runs `server` and `client` concurrently. You can still start them
+   individually with `cd server && npm run dev` and `cd client && npm run dev`.)
