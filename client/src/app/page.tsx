@@ -25,29 +25,16 @@ export default function Page() {
     );
   }
 
-  const handleGenerate = async ({
-    jobDesc,
-    resumeText,
-    jobTitle = '',
-    company = '',
-  }: {
-    jobDesc: string;
-    resumeText: string;
-    jobTitle?: string;
-    company?: string;
-  }) => {
+  const handleGenerate = async ({ jobDesc, resumeText, jobTitle = '', company = '' }) => {
     setLoading(true);
     setCoverLetter('');
 
-    const userId = session.user.id;
-
     try {
-      const res = await fetch('http://localhost:5001/api/generate-cover-letter', {
+      const res = await fetch('/api/generate-cover-letter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jobDesc, resumeText, jobTitle, company, userId }),
+        body: JSON.stringify({ jobDesc, resumeText, jobTitle, company }),
       });
-
       const data = await res.json();
       setCoverLetter(data.coverLetter || 'No cover letter returned.');
     } catch (error) {
