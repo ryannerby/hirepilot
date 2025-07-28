@@ -9,9 +9,12 @@ const router = express.Router();
 const apiKey = process.env.OPENAI_API_KEY;
 const useMock = process.env.USE_MOCK_AI === 'true' || !apiKey;
 
-const openai = new OpenAI({
-  apiKey,
-});
+let openai = null;
+if (!useMock && apiKey) {
+  openai = new OpenAI({
+    apiKey,
+  });
+}
 
 router.post('/', requireUser, async (req, res) => {
   const { jobDesc, resumeText, jobTitle, company } = req.body;
